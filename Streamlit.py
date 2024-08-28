@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[7]:
+# In[9]:
 
 
 # Import necessary libraries
@@ -13,14 +13,18 @@ import xgboost as xgb
 import pickle
 
 
-# In[8]:
+# In[10]:
 
 
-# Load in the XGBoost model
-filename = 'xgboost_model.pkl'  # Ensure this file is in the same directory or provide the full path
-loaded_model = pickle.load(open(filename, 'rb'))
+import numpy as np
+import pandas as pd
+import streamlit as st
+import pickle
 
-# Build a simple Streamlit app
+# Load the model
+with open('models/xgboost_model.pkl', 'rb') as file:
+    loaded_model = pickle.load(file)
+
 st.set_page_config(layout="wide")
 st.header('Financial Fraud Detection App')
 
@@ -61,24 +65,28 @@ transaction_type = st.sidebar.selectbox(
     ('PAYMENT', 'TRANSFER', 'CASH_OUT', 'CASH_IN', 'DEBIT')
 )
 
+# Calculate engineered features based on input
+orig_diff = 1 if newbalanceOrig != oldbalanceOrig - amount else 0
+dest_diff = 1 if newbalanceDest != oldbalanceDest + amount else 0
+surge = 1 if amount > 450000 else 0
+freq_dest = 1  # This is a placeholder. In practice, this would be calculated based on historical data.
+merchant = 1 if st.sidebar.checkbox('Is the receiver a merchant?') else 0
+
+# One-hot encoding for transaction type
+type_PAYMENT = 1 if transaction_type == 'PAYMENT' else 0
+type_TRANSFER = 1 if transaction_type == 'TRANSFER' else 0
+type_CASH_OUT = 1 if transaction_type == 'CASH_OUT' else 0
+type_CASH_IN = 1 if transaction_type == 'CASH_IN' else 0
+type_DEBIT = 1 if transaction_type == 'DEBIT' else 0
+
 # Predict button
 predict_button = st.sidebar.button("Predict Fraud")
 
 if predict_button:
-    # Encode transaction type
-    if transaction_type == 'PAYMENT':
-        type_code = 0
-    elif transaction_type == 'TRANSFER':
-        type_code = 1
-    elif transaction_type == 'CASH_OUT':
-        type_code = 2
-    elif transaction_type == 'CASH_IN':
-        type_code = 3
-    elif transaction_type == 'DEBIT':
-        type_code = 4
-
     # Prepare the input for prediction
-    input_data = np.array([[amount, oldbalanceOrig, newbalanceOrig, oldbalanceDest, newbalanceDest, type_code]])
+    input_data = np.array([[amount, oldbalanceOrig, newbalanceOrig, oldbalanceDest, newbalanceDest, 
+                            orig_diff, dest_diff, surge, freq_dest, merchant, 
+                            type_PAYMENT, type_TRANSFER, type_CASH_OUT, type_CASH_IN, type_DEBIT]])
 
     # Predict using the loaded model
     result = loaded_model.predict(input_data)
