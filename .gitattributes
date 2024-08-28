@@ -1,2 +1,1 @@
-# Auto detect text files and perform LF normalization
-* text=auto
+C:/Users/salam/OneDrive/Documents/Financial[[:space:]]Fraud[[:space:]]Detection[[:space:]]System/Dataset filter=lfs diff=lfs merge=lfs -text
