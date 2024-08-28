@@ -1,17 +1,19 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[2]:
+# In[7]:
 
 
 # Import necessary libraries
-import pandas as pd
-import numpy as np
 import streamlit as st
+import numpy as np
+import pandas as pd
+from sklearn.ensemble import RandomForestClassifier  
+import xgboost as xgb 
 import pickle
 
 
-# In[4]:
+# In[8]:
 
 
 # Load in the XGBoost model
