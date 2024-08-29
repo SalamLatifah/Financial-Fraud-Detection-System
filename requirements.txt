@@ -1,7 +1,5 @@
 streamlit==1.15.2
-python==3.9
-numpy==1.23.5
 pandas==1.5.2
+numpy==1.23.5
 xgboost==1.7.3
-scikit-learn==1.0.2  # Use an older, more stable version
-setuptools>=40.0.0
+scikit-learn==1.2.0
