@@ -1,15 +1,19 @@
-FROM python:3.9-slim
+FROM Python :3.11.5
 
-# Install necessary system dependencies
-RUN apt-get update && apt-get install -y python3-distutils
+#Expose port 8080
+EXPOSE 8080
 
-# Install Python dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+#Copy Requirements.txt file into app directory
+COPY requirements.txt app/requirements.txt
 
-# Copy your Streamlit app
+#install all requirements in requirements.txt
+RUN pip install -r app/requirements.txt
+
+#Copy all files in current directory into app directory
 COPY . /app
+
+#Change Working Directory to app directory
 WORKDIR /app
 
-# Run Streamlit
-CMD ["streamlit", "run", "Streamlit.py"]
+#Run the application on port 8080
+ENTRYPOINT ["streamlit", "run", "streamlit.py", "--server.port=8080", "--server.address=0.0.0.0"]
